@@ -34,7 +34,7 @@ int main() {
     proc->id = id;
     proc->throughput = throughput;
 
-    if (prevProc != NULL || proc->id != prevProc->id) {
+    if (prevProc != NULL && proc->id != prevProc->id) {
       volSwitch++;
     }
 
