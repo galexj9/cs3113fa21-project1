@@ -9,4 +9,8 @@ typedef struct Process {
   int throughput;
 } Process;
 
+Process *get(Process **list, int len, int id);
+
+void put(Process **list, int len, Process *element);
+
 #endif

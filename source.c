@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <list.h>
+#include "list.h"
 
 /* Simulate a process dispatcher and calculate
 ** some relevant statistics */
@@ -17,33 +17,34 @@ int main() {
   scanf("%d", &instructions);
 
   // create a list to keep track of processed ids
-  int *pList;
-  pList = (int *)malloc(threads * sizeof(Process));
-  setEmpty(pList, threads);
+  int **pList;
+  *pList = (int *)malloc(threads * sizeof(Process));
 
-  int volSwitch = 0, involSwitch = 0, id = 0, prevProc = 0;
+  int volSwitch = 0, involSwitch = 0, id = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
   float response = 0, cpuUtilization = 100;
 
   // scan through stdin for processes
   while (scanf("%d", &id) != EOF) {
-    Process *proc = (Process *)malloc(sizeof(Process));
+    Process *proc = (Process *)malloc(sizeof(Process)), *prevProc = NULL;
     scanf("%d", &proc->burst);
     scanf("%d", &proc->priority);
+    proc->id = id;
 
-    if (proc->id != prevProc) {
+    if (proc->id != prevProc->id) {
       volSwitch++;
       waiting += throughput;
     }
 
-    if (proc->id != prevProc && contains(pList, threads, proc) == 1) {
+    Process *oldProc = get(pList, threads, proc->id);
+    if (proc->id != prevProc->id && oldProc != NULL) {
       volSwitch--;
       involSwitch++;
-      // turnaround -= prevProc throughput
+      turnaround -= oldProc->throughput; // sub old throughput
     }
 
     // calculate response time for novel processes
-    if (contains(pList, threads, proc) == -1) {
+    if (get(pList, threads, proc->id) == NULL) {
       response += throughput;
       put(pList, threads, proc);
     }

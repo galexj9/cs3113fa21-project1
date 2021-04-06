@@ -1,17 +1,21 @@
+#include <stdio.h>
 #include "list.h"
 
-int contains(int *list, int len, int el) {
+Process *get(Process **list, int len, int id) {
+  if (list == NULL || len < 1 || id < 1)
+    return NULL;
   for (int i = 0; i < len; i++)
-    if (list[i] == el)
-      return 1;
-  return -1;
+    if (list[i]->id == id)
+      return &list[i];
+  return NULL;
 }
 
-void put(int *list, int len, int el) {
-  for (int i = 0; i < len; i++) {
-    if (list[i] == -1) {
-      list[i] = el;
-      break;
+void put(Process **list, int len, Process *element) {
+  if (list == NULL || len < 1 || element == NULL)
+    return;
+  for (int i = 0; i < len; i++)
+    if (list[i] == NULL) {
+      list[i] = element;
+      return;
     }
-  }
 }
