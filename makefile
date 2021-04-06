@@ -17,4 +17,5 @@ $(TARGET): $(OBJ)
 
 #removes all OBJ files and the EXE
 clean:
+	clear
 	rm -f $(OBJ) $(TARGET)
