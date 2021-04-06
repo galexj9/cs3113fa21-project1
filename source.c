@@ -32,11 +32,10 @@ int main() {
     scanf("%d", &proc->burst);
     scanf("%d", &proc->priority);
     proc->id = id;
+    proc->throughput = throughput;
 
-    if (prevProc != NULL && proc->id != prevProc->id) {
+    if (prevProc != NULL || proc->id != prevProc->id) {
       volSwitch++;
-      waiting += throughput;
-      response += throughput;
     }
 
     Process *oldProc = get(pList, threads, proc->id);
@@ -46,14 +45,16 @@ int main() {
       turnaround -= oldProc->throughput; // sub old throughput
     }
 
+    waiting += throughput;
+    if (get(pList, threads, proc->id) == NULL) {
+      response += throughput;
+      put(pList, threads, proc);
+    }
+
     // Calculate throughput as (total burst time) / (number of instructions)
     throughput += proc->burst;
-    proc->throughput = throughput;
     // add total burst+wait time for the process to turnaround
     turnaround += throughput;
-
-    if (get(pList, threads, proc->id) == NULL)
-      put(pList, threads, proc);
 
     prevProc = proc;
   }
