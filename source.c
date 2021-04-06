@@ -36,19 +36,23 @@ int main() {
 
     if (prevID != proc->id) {
       volSwitch++;
-      Process *oldProc = get(pList, threads, proc->id);
-      if (oldProc != NULL) {
+
+      // time on ready queue (not burst time)
+      waiting += throughput;
+
+      if (get(pList, threads, proc->id) != NULL) {
         volSwitch--;
         involSwitch++;
-        turnaround -= oldProc->turnaround;
       } else {
         response += throughput;
         put(pList, threads, proc);
       }
     }
 
-    // time on ready queue (not burst time)
-    waiting += throughput;
+    Process *oldProc = get(pList, threads, proc->id);
+    if (oldProc != NULL)
+      turnaround -= oldProc->turnaround;
+
     // Calculate throughput as (total burst time) / (number of instructions)
     throughput += proc->burst;
     // add total burst+wait time for the process to turnaround
