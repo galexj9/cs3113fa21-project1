@@ -17,9 +17,8 @@ int main() {
   scanf("%d", &instructions);
 
   // create a list to keep track of processed ids
-  Process **pList;
-  pList = malloc(sizeof(Process *) * threads);
-  for(int i = 0; i < threads; i++)
+  Process **pList = malloc(sizeof(Process *) * threads);
+  for (int i = 0; i < threads; i++)
     pList[i] = malloc(sizeof(Process));
 
   int volSwitch = 0, involSwitch = 0, id = 0;
@@ -27,8 +26,9 @@ int main() {
   float response = 0, cpuUtilization = 100;
 
   // scan through stdin for processes
+  Process *prevProc = NULL;
   while (scanf("%d", &id) != EOF) {
-    Process *proc = (Process *)malloc(sizeof(Process)), *prevProc = NULL;
+    Process *proc = (Process *)malloc(sizeof(Process));
     scanf("%d", &proc->burst);
     scanf("%d", &proc->priority);
     proc->id = id;
@@ -36,6 +36,7 @@ int main() {
     if (prevProc != NULL && proc->id != prevProc->id) {
       volSwitch++;
       waiting += throughput;
+      response += throughput;
     }
 
     Process *oldProc = get(pList, threads, proc->id);
@@ -45,17 +46,14 @@ int main() {
       turnaround -= oldProc->throughput; // sub old throughput
     }
 
-    // calculate response time for novel processes
-    if (get(pList, threads, proc->id) == NULL) {
-      response += throughput;
-      put(pList, threads, proc);
-    }
-
     // Calculate throughput as (total burst time) / (number of instructions)
     throughput += proc->burst;
     proc->throughput = throughput;
     // add total burst+wait time for the process to turnaround
     turnaround += throughput;
+
+    if (get(pList, threads, proc->id) == NULL)
+      put(pList, threads, proc);
 
     prevProc = proc;
   }
