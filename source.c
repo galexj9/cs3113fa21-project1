@@ -26,24 +26,25 @@ int main() {
   float response = 0, cpuUtilization = 100;
 
   // scan through stdin for processes
-  Process *prevProc = NULL;
+  int prevID = 0;
   while (scanf("%d", &id) != EOF) {
     Process *proc = (Process *)malloc(sizeof(Process));
     scanf("%d", &proc->burst);
     scanf("%d", &proc->priority);
     proc->id = id;
-    proc->throughput = throughput + proc->burst;
+    proc->turnaround = throughput + proc->burst;
 
-    if (get(pList, threads, proc->id) == NULL) {
-      response += throughput;
-      put(pList, threads, proc);
-    }
-
-    Process *oldProc = get(pList, threads, proc->id);
-    if (oldProc != NULL) {
-      volSwitch--;
-      involSwitch++;
-      turnaround -= oldProc->throughput; // sub old throughput
+    if (prevID != proc->id) {
+      volSwitch++;
+      Process *oldProc = get(pList, threads, proc->id);
+      if (oldProc != NULL) {
+        volSwitch--;
+        involSwitch++;
+        turnaround -= oldProc->turnaround;
+      } else {
+        response += throughput;
+        put(pList, threads, proc);
+      }
     }
 
     // time on ready queue (not burst time)
@@ -51,9 +52,9 @@ int main() {
     // Calculate throughput as (total burst time) / (number of instructions)
     throughput += proc->burst;
     // add total burst+wait time for the process to turnaround
-    turnaround += throughput;
+    turnaround += throughput; //(wait + burst time) (subtract duplicate threads)
 
-    prevProc = proc;
+    prevID = proc->id;
   }
 
   // average the stats

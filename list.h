@@ -6,7 +6,7 @@ typedef struct Process {
   int id;
   int burst;
   int priority;
-  int throughput;
+  int turnaround;
 } Process;
 
 Process *get(Process **list, int len, int id);
