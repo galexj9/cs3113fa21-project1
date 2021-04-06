@@ -12,7 +12,7 @@ $(TARGET): $(OBJ)
 	$(CC) -o $(TARGET) $(OBJ)
 
 #pattern rule to make all OBJ files
-%.o: %.c 
+%.o: %.c list.h
 	$(CC) -c $< -o $@
 
 #removes all OBJ files and the EXE
