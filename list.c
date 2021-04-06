@@ -6,7 +6,7 @@ Process *get(Process **list, int len, int id) {
     return NULL;
   for (int i = 0; i < len; i++)
     if (list[i]->id == id)
-      return &list[i];
+      return list[i];
   return NULL;
 }
 

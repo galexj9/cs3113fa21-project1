@@ -17,8 +17,8 @@ int main() {
   scanf("%d", &instructions);
 
   // create a list to keep track of processed ids
-  int **pList;
-  *pList = (int *)malloc(threads * sizeof(Process));
+  Process **pList;
+  *pList = (Process *)malloc(threads * sizeof(Process));
 
   int volSwitch = 0, involSwitch = 0, id = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
@@ -55,7 +55,7 @@ int main() {
     // add total burst+wait time for the process to turnaround
     turnaround += throughput;
 
-    prevProc = proc->id;
+    prevProc = proc;
   }
 
   // average the stats

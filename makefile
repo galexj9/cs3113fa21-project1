@@ -1,7 +1,8 @@
 #Variables
 TARGET = project1
-SRC = source.c
+SRC = source.c list.c
 OBJ = $(SRC:.c=.o)
+HEAD = list.h
 CC = gcc -g
 
 
@@ -12,7 +13,7 @@ $(TARGET): $(OBJ)
 	$(CC) -o $(TARGET) $(OBJ)
 
 #pattern rule to make all OBJ files
-%.o: %.c list.h
+%.o: %.c $(HEAD)
 	$(CC) -c $< -o $@
 
 #removes all OBJ files and the EXE
