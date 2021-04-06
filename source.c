@@ -18,7 +18,9 @@ int main() {
 
   // create a list to keep track of processed ids
   Process **pList;
-  *pList = (Process *)malloc(threads * sizeof(Process));
+  pList = malloc(sizeof(Process *) * threads);
+  for(int i = 0; i < threads; i++)
+    pList[i] = malloc(sizeof(Process));
 
   int volSwitch = 0, involSwitch = 0, id = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
@@ -31,13 +33,13 @@ int main() {
     scanf("%d", &proc->priority);
     proc->id = id;
 
-    if (proc->id != prevProc->id) {
+    if (prevProc != NULL && proc->id != prevProc->id) {
       volSwitch++;
       waiting += throughput;
     }
 
     Process *oldProc = get(pList, threads, proc->id);
-    if (proc->id != prevProc->id && oldProc != NULL) {
+    if (prevProc != NULL && proc->id != prevProc->id && oldProc != NULL) {
       volSwitch--;
       involSwitch++;
       turnaround -= oldProc->throughput; // sub old throughput
