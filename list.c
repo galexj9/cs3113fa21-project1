@@ -17,7 +17,7 @@ void put(Process **list, int len, Process *element) {
     return;
 
   for (int i = 0; i < len; i++)
-    if (list[i]->id == -1) {
+    if (list[i] == NULL) {
       list[i] = element;
       return;
     }

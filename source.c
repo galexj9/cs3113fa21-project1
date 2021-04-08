@@ -16,10 +16,6 @@ int main() {
 
   // create a list to keep track of processed ids
   Process **pList = malloc(sizeof(Process *) * threads);
-  for (int i = 0; i < threads; i++) {
-    pList[i] = malloc(sizeof(Process));
-    pList[i]->id = -1;
-  }
 
   int volSwitch = 0, involSwitch = 0, id = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
@@ -34,7 +30,7 @@ int main() {
     proc->id = id;
     proc->turnaround = throughput + proc->burst;
 
-    //only count turnaround of processes the final time they complete
+    // only count turnaround of processes the final time they complete
     Process *oldProc = get(pList, threads, proc->id);
     if (oldProc != NULL)
       turnaround -= oldProc->turnaround;
@@ -53,7 +49,7 @@ int main() {
         put(pList, threads, proc);
       }
     }
-     
+
     // Calculate throughput as (total burst time) / (number of instructions)
     throughput += proc->burst;
     // add total burst+wait time for the process to turnaround
