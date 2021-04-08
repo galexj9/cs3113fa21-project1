@@ -6,29 +6,31 @@
 ** some relevant statistics */
 int main(int argc, char **argv) {
   // select file from arg or use stdin
-  File *fp = (argc) ? fopen(argv[0], "r") : stdin;
+  FILE *fp = (argc == 2)? fopen(argv[1], "r") : stdin;
 
   // Extract the formatted info from stdin
   int processors, threads, instructions;
-  scanf("%d", &processors);
-  scanf("%d", &threads);
-  scanf("%d", &instructions);
+  fscanf(fp, "%d", &processors);
+  fscanf(fp, "%d", &threads);
+  fscanf(fp, "%d", &instructions);
 
   // create a list to keep track of processed ids
   Process **pList = malloc(sizeof(Process *) * threads);
 
-  int volSwitch = 0, involSwitch = 0, id = 0;
+  int volSwitch = 0, involSwitch = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
   float response = 0, cpuUtilization = 100;
 
   // scan through stdin for processes
   int prevID = 0;
-  while (fscanf(fp, "%d", &id) != EOF) {
+  while (!feof(fp)) {
     Process *proc = (Process *)malloc(sizeof(Process));
+    fscanf(fp, "%d", &proc->id);
     fscanf(fp, "%d", &proc->burst);
     fscanf(fp, "%d", &proc->priority);
-    proc->id = id;
     proc->turnaround = throughput + proc->burst;
+
+    if(feof(fp)) break;
 
     // only count turnaround of processes the final time they complete
     Process *oldProc = get(pList, threads, proc->id);
@@ -70,10 +72,10 @@ int main(int argc, char **argv) {
   ** Average Througput
   ** Average Waiting Time
   ** Average Response Time */
-  fprintf(fp, "%d\n%d\n", volSwitch, involSwitch);
-  fprintf(fp, "%0.2f\n", cpuUtilization);
-  fprintf(fp, "%0.2f\n", throughput);
-  fprintf(fp, "%0.2f\n%0.2f\n%0.2f\n", turnaround, waiting, response);
+  printf("%d\n%d\n", volSwitch, involSwitch);
+  printf("%0.2f\n", cpuUtilization);
+  printf("%0.2f\n", throughput);
+  printf("%0.2f\n%0.2f\n%0.2f\n", turnaround, waiting, response);
 
   return 0;
 }
