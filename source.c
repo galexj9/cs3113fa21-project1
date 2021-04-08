@@ -4,7 +4,10 @@
 
 /* Simulate a process dispatcher and calculate
 ** some relevant statistics */
-int main() {
+int main(int argc, char **argv) {
+  // select file from arg or use stdin
+  File *fp = (argc) ? fopen(argv[0], "r") : stdin;
+
   // Extract the formatted info from stdin
   int processors, threads, instructions;
   scanf("%d", &processors);
@@ -20,10 +23,10 @@ int main() {
 
   // scan through stdin for processes
   int prevID = 0;
-  while (scanf("%d", &id) != EOF) {
+  while (fscanf(fp, "%d", &id) != EOF) {
     Process *proc = (Process *)malloc(sizeof(Process));
-    scanf("%d", &proc->burst);
-    scanf("%d", &proc->priority);
+    fscanf(fp, "%d", &proc->burst);
+    fscanf(fp, "%d", &proc->priority);
     proc->id = id;
     proc->turnaround = throughput + proc->burst;
 
@@ -67,10 +70,10 @@ int main() {
   ** Average Througput
   ** Average Waiting Time
   ** Average Response Time */
-  printf("%d\n%d\n", volSwitch, involSwitch);
-  printf("%0.2f\n", cpuUtilization);
-  printf("%0.2f\n", throughput);
-  printf("%0.2f\n%0.2f\n%0.2f\n", turnaround, waiting, response);
+  fprintf(fp, "%d\n%d\n", volSwitch, involSwitch);
+  fprintf(fp, "%0.2f\n", cpuUtilization);
+  fprintf(fp, "%0.2f\n", throughput);
+  fprintf(fp, "%0.2f\n%0.2f\n%0.2f\n", turnaround, waiting, response);
 
   return 0;
 }
