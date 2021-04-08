@@ -4,9 +4,6 @@
 
 /* Simulate a process dispatcher and calculate
 ** some relevant statistics */
-/* <Number of Processes Available to Run>
-** <Number of Execution Contexts> <Number of instructions to schedule>
-** <pid> <burst time> <priority>... */
 int main() {
   // Extract the formatted info from stdin
   int processors, threads, instructions;
@@ -72,8 +69,8 @@ int main() {
   ** Average Response Time */
   printf("%d\n%d\n", volSwitch, involSwitch);
   printf("%0.2f\n", cpuUtilization);
-  printf("%0.2f\n%0.2f\n%0.2f\n%0.2f\n", throughput, turnaround, waiting,
-         response);
+  printf("%0.2f\n", throughput);
+  printf("%0.2f\n%0.2f\n%0.2f\n", turnaround, waiting, response);
 
   return 0;
 }
