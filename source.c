@@ -4,10 +4,8 @@
 
 /* Simulate a process dispatcher and calculate
 ** some relevant statistics */
-// Uses a formatted file to stdin for the processes
 /* <Number of Processes Available to Run>
-** <Number of Execution Elements "contexts"> <Number of instructions to
-*schedule>
+** <Number of Execution Contexts> <Number of instructions to schedule>
 ** <pid> <burst time> <priority>... */
 int main() {
   // Extract the formatted info from stdin
@@ -18,8 +16,10 @@ int main() {
 
   // create a list to keep track of processed ids
   Process **pList = malloc(sizeof(Process *) * threads);
-  for (int i = 0; i < threads; i++)
+  for (int i = 0; i < threads; i++) {
     pList[i] = malloc(sizeof(Process));
+    pList[i]->id = -1;
+  }
 
   int volSwitch = 0, involSwitch = 0, id = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
@@ -33,6 +33,11 @@ int main() {
     scanf("%d", &proc->priority);
     proc->id = id;
     proc->turnaround = throughput + proc->burst;
+
+    //only count turnaround of processes the final time they complete
+    Process *oldProc = get(pList, threads, proc->id);
+    if (oldProc != NULL)
+      turnaround -= oldProc->turnaround;
 
     if (prevID != proc->id) {
       volSwitch++;
@@ -48,15 +53,11 @@ int main() {
         put(pList, threads, proc);
       }
     }
-
-    Process *oldProc = get(pList, threads, proc->id);
-    if (oldProc != NULL)
-      turnaround -= oldProc->turnaround;
-
+     
     // Calculate throughput as (total burst time) / (number of instructions)
     throughput += proc->burst;
     // add total burst+wait time for the process to turnaround
-    turnaround += throughput; //(wait + burst time) (subtract duplicate threads)
+    turnaround += throughput;
 
     prevID = proc->id;
   }
@@ -73,7 +74,6 @@ int main() {
   ** Average Througput
   ** Average Waiting Time
   ** Average Response Time */
-  printf("## Output Stats ##\n");
   printf("%d\n%d\n", volSwitch, involSwitch);
   printf("%0.2f\n", cpuUtilization);
   printf("%0.2f\n%0.2f\n%0.2f\n%0.2f\n", throughput, turnaround, waiting,
