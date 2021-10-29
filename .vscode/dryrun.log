@@ -1,0 +1,6 @@
+C:\Program Files (x86)\GnuMakeWin32\bin\make.exe all --dry-run --keep-going --print-directory
+make: Entering directory `c:/Users/Garrett/Desktop/Everything/Programming/VSCode/cs3113fa21-project1'
+gcc -g -o project1 source.o list.o
+ 
+make: Leaving directory `c:/Users/Garrett/Desktop/Everything/Programming/VSCode/cs3113fa21-project1'
+ 

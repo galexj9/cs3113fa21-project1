@@ -6,66 +6,62 @@
 ** some relevant statistics */
 int main(int argc, char **argv) {
   // select file from arg or use stdin
-  FILE *fp = (argc == 2)? fopen(argv[1], "r") : stdin;
+  FILE *fp = (argc == 2) ? fopen(argv[1], "r") : stdin;
 
   // Extract the formatted info from stdin
   int processors, threads, instructions;
   fscanf(fp, "%d%d%d", &processors, &threads, &instructions);
 
-	if(!processors || !threads || !instructions){
-		printf("Invalid input");
-		exit(-1);
-	}
-	
-  // create a list to keep track of processed ids
+  if (!processors || !threads || !instructions) {
+    fprintf(stderr, "Invalid input");
+    exit(-1);
+  }
+
+  // create an array to keep track of processed ids
   Process **pList = malloc(sizeof(Process *) * instructions);
 
   int volSwitch = 0, involSwitch = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
   float response = 0, cpuUtilization = 100;
 
-	// Build the process ready queue
-	float waittime = 0;
-	for(int i = 0; i < instructions; i++) {
-    Process *proc = (Process *) malloc(sizeof(Process));
+  // Loop through the instructions
+  for (int i = 0; i < instructions; i++) {
+    // scan in a new process to dispatch
+    Process *proc = (Process *)malloc(sizeof(Process));
     fscanf(fp, "%d%d%d", &proc->id, &proc->burst, &proc->priority);
-    proc->waittime = waittime;
-    waittime += proc->burst;
-
+    proc->waittime = throughput;
     pList[i] = proc;
-  }
 
-	//Loop through the instructions
-  for(int i = 0; i < instructions; i++) {
-		Process *proc = pList[i];
-		Process *oldProc = get(pList, instructions, proc->id);
-		
-		if(i == 0 || proc->id != pList[i-1]->id) {
-			volSwitch += 1;
-			waiting += throughput;
-		}
+    // if the context switched
+    if (i == 0 || proc->id != pList[i - 1]->id) {
+      volSwitch += 1;
+      waiting += throughput;
+    }
 
-		if(oldProc != NULL && oldProc != proc) {
-		  if (oldProc != pList[i-1]) {
-				volSwitch -= 1;
-				involSwitch += 1;
-			}
-			//only add the first time a process is called's wait time
-			turnaround -= proc->waittime;
-			//remove the oldProc so the next get() returns the prev proccess
-			pop(pList, instructions, oldProc);
-		} else {
-			response += throughput;
-		}
+    // if the process has run before
+    Process *oldProc = get(pList, instructions, proc->id);
+    if (oldProc != NULL && oldProc != proc) {
+      if (oldProc != pList[i - 1]) {
+        volSwitch -= 1;
+        involSwitch += 1;
+      }
+      // only add waittime from the first time a process is called
+      turnaround -= proc->waittime;
+      // remove the oldProc so the next get() returns the prev proccess
+      pop(pList, instructions, oldProc);
+    } else {
+      // response is measured from the first time a process is called
+      response += throughput;
+    }
 
-    // Calculate throughput as (total burst time) / (number of instructions)
+    // add process runtime to throughput
     throughput += proc->burst;
-    // add total burst+wait time for the process to turnaround
+    // add total run+wait time for the process to turnaround
     turnaround += throughput;
   }
 
   // average the stats
-  throughput = (throughput)? threads / throughput : 0;
+  throughput = (throughput) ? threads / throughput : 0;
   turnaround /= threads;
   waiting /= threads;
   response /= threads;

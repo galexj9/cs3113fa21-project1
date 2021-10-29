@@ -1,0 +1,11 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "c:\\Users\\Garrett\\Desktop\\Everything\\Programming\\VSCode\\cs3113fa21-project1",
+            "binaryPath": "c:\\Users\\Garrett\\Desktop\\Everything\\Programming\\VSCode\\cs3113fa21-project1\\project1",
+            "binaryArgs": []
+        }
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
+}
