@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
   // select file from arg or use stdin
   FILE *fp = (argc == 2) ? fopen(argv[1], "r") : stdin;
 
-  // Extract the formatted info from stdin
+  // Get formatted info from stdin
   int processors, threads, instructions;
   fscanf(fp, "%d%d%d", &processors, &threads, &instructions);
 
@@ -20,6 +20,7 @@ int main(int argc, char **argv) {
   // create an array to keep track of processed ids
   Process **pList = malloc(sizeof(Process *) * instructions);
 
+	//global/total statitics to track
   int volSwitch = 0, involSwitch = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
   float response = 0, cpuUtilization = 100;
@@ -50,7 +51,6 @@ int main(int argc, char **argv) {
       // remove the oldProc so the next get() returns the prev proccess
       pop(pList, instructions, oldProc);
     } else {
-      // response is measured from the first time a process is called
       response += throughput;
     }
 
@@ -76,6 +76,5 @@ int main(int argc, char **argv) {
   printf("%0.2f\n", cpuUtilization);
   printf("%0.2f\n", throughput);
   printf("%0.2f\n%0.2f\n%0.2f\n", turnaround, waiting, response);
-
   return 0;
 }

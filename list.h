@@ -9,7 +9,7 @@ typedef struct Process {
   int waittime;
 } Process;
 
-Process *get(Process **list, int len, int id);
+Process* get(Process **list, int len, int id);
 
 void pop(Process **list, int len, Process *element);
 
