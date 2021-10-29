@@ -6,10 +6,12 @@ typedef struct Process {
   int id;
   int burst;
   int priority;
-  int turnaround;
+  int waittime;
 } Process;
 
 Process *get(Process **list, int len, int id);
+
+void pop(Process **list, int len, Process *element);
 
 void put(Process **list, int len, Process *element);
 

@@ -10,58 +10,62 @@ int main(int argc, char **argv) {
 
   // Extract the formatted info from stdin
   int processors, threads, instructions;
-  fscanf(fp, "%d", &processors);
-  fscanf(fp, "%d", &threads);
-  fscanf(fp, "%d", &instructions);
+  fscanf(fp, "%d%d%d", &processors, &threads, &instructions);
 
+	if(!processors || !threads || !instructions){
+		printf("Invalid input");
+		exit(-1);
+	}
+	
   // create a list to keep track of processed ids
-  Process **pList = malloc(sizeof(Process *) * threads);
+  Process **pList = malloc(sizeof(Process *) * instructions);
 
   int volSwitch = 0, involSwitch = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
   float response = 0, cpuUtilization = 100;
 
-  // scan through stdin for processes
-  int prevID = 0;
-  while (!feof(fp)) {
-    Process *proc = (Process *)malloc(sizeof(Process));
-    fscanf(fp, "%d", &proc->id);
-    fscanf(fp, "%d", &proc->burst);
-    fscanf(fp, "%d", &proc->priority);
-    proc->turnaround = throughput + proc->burst;
+	// Build the process ready queue
+	float waittime = 0;
+	for(int i = 0; i < instructions; i++) {
+    Process *proc = (Process *) malloc(sizeof(Process));
+    fscanf(fp, "%d%d%d", &proc->id, &proc->burst, &proc->priority);
+    proc->waittime = waittime;
+    waittime += proc->burst;
 
-    if(feof(fp)) break;
+    pList[i] = proc;
+  }
 
-    // only count turnaround of processes the final time they complete
-    Process *oldProc = get(pList, threads, proc->id);
-    if (oldProc != NULL)
-      turnaround -= oldProc->turnaround;
+	//Loop through the instructions
+  for(int i = 0; i < instructions; i++) {
+		Process *proc = pList[i];
+		Process *oldProc = get(pList, instructions, proc->id);
+		
+		if(i == 0 || proc->id != pList[i-1]->id) {
+			volSwitch += 1;
+			waiting += throughput;
+		}
 
-    if (prevID != proc->id) {
-      volSwitch++;
-
-      // time on ready queue (not burst time)
-      waiting += throughput;
-
-      if (get(pList, threads, proc->id) != NULL) {
-        volSwitch--;
-        involSwitch++;
-      } else {
-        response += throughput;
-        put(pList, threads, proc);
-      }
-    }
+		if(oldProc != NULL && oldProc != proc) {
+		  if (oldProc != pList[i-1]) {
+				volSwitch -= 1;
+				involSwitch += 1;
+			}
+			//only add the first time a process is called's wait time
+			turnaround -= proc->waittime;
+			//remove the oldProc so the next get() returns the prev proccess
+			pop(pList, instructions, oldProc);
+		} else {
+			response += throughput;
+		}
 
     // Calculate throughput as (total burst time) / (number of instructions)
     throughput += proc->burst;
     // add total burst+wait time for the process to turnaround
     turnaround += throughput;
-
-    prevID = proc->id;
   }
 
   // average the stats
-  throughput = threads / throughput;
+  throughput = (throughput)? threads / throughput : 0;
   turnaround /= threads;
   waiting /= threads;
   response /= threads;

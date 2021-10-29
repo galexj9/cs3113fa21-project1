@@ -12,6 +12,18 @@ Process *get(Process **list, int len, int id) {
   return NULL;
 }
 
+void pop(Process **list, int len, Process *element) {
+	if (list == NULL || len < 1 || element == NULL)
+    return;
+
+  for (int i = 0; i < len; i++)
+    if (list[i] != NULL && list[i]->id == element->id) {
+    	list[i] = NULL;
+    	return;
+    }
+	
+}
+
 void put(Process **list, int len, Process *element) {
   if (list == NULL || len < 1 || element == NULL)
     return;

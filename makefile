@@ -5,7 +5,6 @@ OBJ = $(SRC:.c=.o)
 HEAD = list.h
 CC = gcc -g
 
-
 all: $(TARGET)
 
 #Compiles TARGET using all the OBJ files
