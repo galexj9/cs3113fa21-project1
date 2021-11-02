@@ -1,11 +1,13 @@
 Introduction to OS Class Project 1 - Simulating a CPU Dispatcher
-cs3113sp21-project1
+cs3113fa21-project1
 Garrett Alexander
 
 How to Use
 - from the command line run 'make' to build the project
 - Run project1 with a formatted file directed to stdin
-- ex: ./project0 < readFile > readOut
+- ex: ./project1 < readFile > readOut
+- Or Run project1 with an input file as the first argument
+- ex: ./project1 input
 
 Requirements and Limitations
 - This program runs on my computer.

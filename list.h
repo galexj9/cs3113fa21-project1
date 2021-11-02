@@ -9,10 +9,10 @@ typedef struct Process {
   int waittime;
 } Process;
 
-Process* get(Process **list, int len, int id);
+Process* get(Process **list, int id, int len);
 
-void pop(Process **list, int len, Process *element);
+void pop(Process **list, Process *element, int len);
 
-void put(Process **list, int len, Process *element);
+void push(Process **list, Process *element, int i);
 
 #endif

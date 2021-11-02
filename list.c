@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "list.h"
 
-Process *get(Process **list, int len, int id) {
-  if (list == NULL || len < 1 || id < 1)
+//retrive a process from the list array
+Process *get(Process **list, int id, int len) {
+  if (list == NULL || id < 1)
     return NULL;
 
   for (int i = 0; i < len; i++)
@@ -12,8 +13,9 @@ Process *get(Process **list, int len, int id) {
   return NULL;
 }
 
-void pop(Process **list, int len, Process *element) {
-	if (list == NULL || len < 1 || element == NULL)
+//remove a process from the list array
+void pop(Process **list, Process *element, int len) {
+	if (list == NULL || element == NULL)
     return;
 
   for (int i = 0; i < len; i++)
@@ -21,16 +23,12 @@ void pop(Process **list, int len, Process *element) {
     	list[i] = NULL;
     	return;
     }
-	
 }
 
-void put(Process **list, int len, Process *element) {
-  if (list == NULL || len < 1 || element == NULL)
+//add a process to the list array
+void push(Process **list, Process *element, int i) {
+  if (list == NULL || element == NULL)
     return;
 
-  for (int i = 0; i < len; i++)
-    if (list[i] == NULL) {
-      list[i] = element;
-      return;
-    }
+   list[i] = element;
 }
