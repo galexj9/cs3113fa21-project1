@@ -28,9 +28,9 @@ int main(int argc, char **argv) {
   int volSwitch = 0, involSwitch = 0, nonSwitch = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
   float response = 0, cpuUtilization = 100;
-	Process* prev = NULL;
 
 	//build the list of processes
+	Process* prev = NULL;
   for (int i = 0; i < instructions; i++) {
     Process *proc = (Process *) malloc(sizeof(Process));
     fscanf(infp, "%d%d%d", &proc->id, &proc->burst, &proc->priority);
@@ -52,20 +52,18 @@ int main(int argc, char **argv) {
 
   Process* proc = *pList;
 	Process* prevProc = NULL;
-
 	waiting += proc->waittime;
 	response += proc->waittime;
 
-	//loop thru the sorted list
+	//loop thru the sorted list starting with the 2nd element
 	for (int i = 1; i < instructions; i++) {
 		prevProc = proc;
 		proc = proc->next;
 
 		//if the process is continuing
 		if (prevProc->id == proc->id) {
-			//add time spent waiting since last run
+			//add time spent waiting since last run and remove old run's completion time
 			waiting += proc->waittime - (prevProc->waittime + prevProc->burst);
-			//remove old run's completion time
 			turnaround -= prevProc->waittime + prevProc->burst;
 		}
 		//first time a process runs record its wait and reponse times
@@ -73,7 +71,6 @@ int main(int argc, char **argv) {
 			waiting += proc->waittime;
 			response += proc->waittime;
 		}
-
 	//fprintf(stderr, "process: %d, turnaround: %05.2f, waiting: %05.2f, response: %05.2f\n", proc->id, turnaround, waiting, response);
 	}
 
