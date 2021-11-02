@@ -1,18 +1,18 @@
-// prevents header file from being processed twice
+//prevents header file from being processed twice
 #ifndef LIST_H_
 #define LIST_H_
 
 typedef struct Process {
-  int id;
-  int burst;
-  int priority;
-  int waittime;
+	int id;
+	int burst;
+	int priority;
+	int waittime;
+	struct Process* next;
 } Process;
 
-Process* get(Process **list, int id, int len);
+//push a node to the end of a list
+extern Process* push(Process* head, Process* element);
 
-void pop(Process **list, Process *element, int len);
-
-void push(Process **list, Process *element, int i);
-
+//sorts the list in descending order using mergesort
+extern void sort(Process** list);
 #endif
