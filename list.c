@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "list.h"
 
 /* Process { int id; int burst; int priority; int waittime; Process* next; }; */
