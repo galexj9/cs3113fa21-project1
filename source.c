@@ -26,8 +26,8 @@ int main(int argc, char **argv) {
 
 	// total statitics to track
   int volSwitch = 0, involSwitch = 0, nonSwitch = 0;
-  float throughput = 0, turnaround = 0, waiting = 0;
-  float response = 0, cpuUtilization = 100;
+  double throughput = 0, turnaround = 0, waiting = 0;
+  double response = 0, cpuUtilization = 100;
 
 	//build the list of processes
 	Process* prev = NULL;
