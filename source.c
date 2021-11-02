@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "list.h"
 
+void print(FILE* fp, Process* l);
+
 /* Simulate a process dispatcher and calculate
 ** some relevant statistics */
 int main(int argc, char **argv) {
@@ -19,63 +21,70 @@ int main(int argc, char **argv) {
     exit(-1);
   }
 
-  // create an array to keep track of processed ids
-  Process **pList = malloc(sizeof(Process *) * instructions);
+  // create a linked list to keep track of process ids
+  Process **pList = malloc(sizeof(Process *));
 
 	// total statitics to track
-  int volSwitch = 0, involSwitch = 0;
+  int volSwitch = 0, involSwitch = 0, nonSwitch = 0;
   float throughput = 0, turnaround = 0, waiting = 0;
   float response = 0, cpuUtilization = 100;
 	Process* prev = NULL;
 
-  // Loop through the instructions
+	//build the list of processes
   for (int i = 0; i < instructions; i++) {
-
-    // scan in a new process to dispatch
-    Process *proc = (Process *)malloc(sizeof(Process));
+    Process *proc = (Process *) malloc(sizeof(Process));
     fscanf(infp, "%d%d%d", &proc->id, &proc->burst, &proc->priority);
     proc->waittime = throughput;
 
-    //get the first instance of any continuing process
-    Process *oldProc = get(pList, proc->id, instructions);
+		//track the number of times the context doesn't switch
+		if (prev && prev->id == proc->id)
+			nonSwitch += 1;
 
-    // if the context switched
-    if (!prev || proc->id != prev->id)
-    	if (oldProc != NULL)
-    		involSwitch += 1;
-    	else
-    		volSwitch += 1;
+		throughput += proc->burst;
+		turnaround += throughput;
 
-		//if this is the first time processing a thread
-    if (oldProc == NULL) {
-			waiting += throughput;
-			response += throughput;
-		} else {
-			// add the time spent waiting since the previous proccess ran
-			waiting += throughput - (oldProc->waittime + oldProc->burst);
-			// sub the old turnaround time since the old process was not completed
-			turnaround -= oldProc->waittime + oldProc->burst;
-			//remove the old proc from the list so get() returns only the prev proc
-      pop(pList, oldProc, instructions);
+		*pList = push(*pList, proc);
+		prev = proc;
+	}
+
+  //sort processes by id and in order submitted
+	sort(pList);
+
+  Process* proc = *pList;
+	Process* prevProc = NULL;
+
+	waiting += proc->waittime;
+	response += proc->waittime;
+
+	//loop thru the sorted list
+	for (int i = 1; i < instructions; i++) {
+		prevProc = proc;
+		proc = proc->next;
+
+		//if the process is continuing
+		if (prevProc->id == proc->id) {
+			//add time spent waiting since last run
+			waiting += proc->waittime - (prevProc->waittime + prevProc->burst);
+			//remove old run's completion time
+			turnaround -= prevProc->waittime + prevProc->burst;
+		}
+		//first time a process runs record its wait and reponse times
+		else {
+			waiting += proc->waittime;
+			response += proc->waittime;
 		}
 
-    // add process runtime to throughput and proccess completion time to turnaround
-    turnaround += throughput + proc->burst;
-    throughput += proc->burst;
-    push(pList, proc, i);
-    prev = proc;
+	//fprintf(stderr, "process: %d, turnaround: %05.2f, waiting: %05.2f, response: %05.2f\n", proc->id, turnaround, waiting, response);
+	}
 
- 		//fprintf(stderr, "process: %d, throughput: %05.2f, turnaround: %05.2f, waiting: %05.2f, response: %05.2f, instruction: %d\n", proc->id, throughput, turnaround, waiting, response, i);
-		//fprintf(stderr, "process: %d, vol: %d, invol: %d\n", proc->id,  volSwitch, involSwitch);
-  }
-	//fprintf(stderr, "averages:   throughput: %05.2f, turnaround: %05.2f, waiting: %05.2f, response: %05.2f\n", throughput, waiting, response, turnaround);
+	volSwitch = threads;
+	involSwitch = instructions - threads - nonSwitch;
 
   // average the stats
   throughput = (throughput) ? threads / throughput : 0;
   turnaround /= threads;
   waiting /= threads;
   response /= threads;
-
 
   /* Output the Scheduler Stats:
   ** Voltary Context Switches			  (# of times switching to a new process)
@@ -87,4 +96,11 @@ int main(int argc, char **argv) {
   fprintf(outfp, "%0.2f\n", cpuUtilization);
   fprintf(outfp, "%0.2f\n%0.2f\n%0.2f\n%0.2f\n", throughput, turnaround, waiting, response);
   return 0;
+}
+
+void print(FILE *fp, Process* l) {
+	while (l) {
+		fprintf(fp, "Process %d burst %d priority %d\n", l->id, l->burst, l->priority);
+		l = l->next;
+	}
 }
